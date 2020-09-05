@@ -106,8 +106,25 @@ class HashTable:
         # take the hash and mod it with len of array
         index = self.hash_index(key)
         # go to index and put in value
-        # if self.storage[index] is not None:
-            #collision!
+        if self.storage[index] is not None:
+            #collision! search through linked listed to see if key already exisits - if so overwrite the value
+            cur_node = self.storage[index]
+            while cur_node is not None:
+                if cur_node.key == key:
+                    cur_node.value = value
+                    break
+                cur_node = cur_node.next
+            # key not found in linked list - add new entry to head
+            cur_bucket = self.storage[index]
+            self.storage[index] = HashTableEntry(key, value)
+            self.storage[index].next = cur_bucket
+            self.size += 1
+        else:
+            # we have an empty slot, add a new node
+            self.storage[index] = HashTableEntry(key, value)
+            self.size += 1
+            
+            
             
         self.storage[index] = value
         # self.storage[self.hash_index(key)] = value
