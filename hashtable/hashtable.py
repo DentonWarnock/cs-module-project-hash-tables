@@ -18,12 +18,17 @@ class HashTable:
     that accepts string keys
 
     Implement this.
+    
+    'make a hash table backed by an array'
     """
 
     def __init__(self, capacity):
-        self.capacity = capacity
+        if capacity < MIN_CAPACITY:
+            self.capacity = MIN_CAPACITY
+        else:
+            self.capacity = capacity
         self.storage = [None] * capacity
-        self.num_items = 0
+        self.size = 0
 
 
     def get_num_slots(self):
@@ -36,7 +41,7 @@ class HashTable:
 
         Implement this.
         """
-        return len(self.storage )
+        return len(self.storage)
 
 
     def get_load_factor(self):
@@ -56,6 +61,17 @@ class HashTable:
         """
 
         # Your code here
+        FNV_offset_basis = 14695981039346656037
+        FNV_prime = 1099511628211
+        
+        hash = FNV_offset_basis
+        key_bytes = key.encode()
+        
+        for byte in key_bytes:
+            hash = hash * FNV_prime
+            hash = hash ^ byte
+            
+            
 
 
     def djb2(self, key):
@@ -66,7 +82,7 @@ class HashTable:
         """
         hash = 5381
         for character in key:
-            hash = (hash * 33) + ord(character)
+            hash = (hash * 33) + hash + ord(character)
         return hash
 
 
@@ -85,8 +101,16 @@ class HashTable:
         Hash collisions should be handled with Linked List Chaining.
 
         Implement this.
-        """
-        # Your code here
+        """        
+        # hash the key
+        # take the hash and mod it with len of array
+        index = self.hash_index(key)
+        # go to index and put in value
+        # if self.storage[index] is not None:
+            #collision!
+            
+        self.storage[index] = value
+        # self.storage[self.hash_index(key)] = value
 
 
     def delete(self, key):
@@ -97,7 +121,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+       # assign bucket back to None
+        index = self.hash_index(key)  
+        value = self.storage[index]  
+        if value: 
+            self.storage[index] = None
+            return value
+        else:
+            return f"no value for {key}"
 
 
     def get(self, key):
@@ -108,7 +139,13 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # hash the key
+         # take the hash and mod it with len of array
+        index = self.hash_index(key)
+          # go to index and put in value
+        value = self.storage[index]
+          
+        return value
 
 
     def resize(self, new_capacity):
