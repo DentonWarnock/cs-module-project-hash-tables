@@ -179,7 +179,7 @@ class HashTable:
                 return cur_node.value
             cur_node = cur_node.next
         # key not found - return None
-        return None          
+        return None
        
 
 
@@ -190,7 +190,19 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+       # make a copy of the storage array
+        copy_storage = self.storage
+       # set the new capacity
+        self.capacity = new_capacity
+       # resize the array based on new capacity
+        self.storage = [None] * self.capacity
+        self.size = 0
+       # add all of copied storage items to new resized array
+        for bucket in copy_storage:
+            cur_node = bucket
+            while cur_node is not None:
+                self.put(cur_node.key, cur_node.value)
+                cur_node = cur_node.next
 
 
 
