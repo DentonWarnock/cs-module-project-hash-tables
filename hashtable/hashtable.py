@@ -123,12 +123,7 @@ class HashTable:
             # we have an empty slot, add a new node
             self.storage[index] = HashTableEntry(key, value)
             self.size += 1
-            
-            
-            
-        self.storage[index] = value
-        # self.storage[self.hash_index(key)] = value
-
+        
 
     def delete(self, key):
         """
@@ -140,13 +135,31 @@ class HashTable:
         """
        # assign bucket back to None
         index = self.hash_index(key)  
-        value = self.storage[index]  
-        if value: 
-            self.storage[index] = None
-            return value
+        cur_node = self.storage[index]
+        if cur_node is None:
+            return f"{key} not found"
         else:
-            return f"no value for {key}"
-
+            # if head is the value, remove head by pointing index value to head.next, reduce size by 1, and return removed value
+            if cur_node.key == key:
+                self.storage[index] = cur_node.next
+                self.size -= 1
+                return cur_node.value
+            else:
+                # search through SLL and remove pointer to item if key is found
+                prev_node = cur_node
+                cur_node = cur_node.next
+                while cur_node is not None:
+                    if cur_node.key == key:
+                        prev_node.next = cur_node.next
+                        self.size -= 1
+                        return cur_node.value
+                    else:
+                        # iterate the loop until end
+                        prev_node = cur_node
+                        cur_node = cur_node.next
+                # key not found, return none
+                return f"{key} not found"
+     
 
     def get(self, key):
         """
@@ -160,9 +173,14 @@ class HashTable:
          # take the hash and mod it with len of array
         index = self.hash_index(key)
           # go to index and put in value
-        value = self.storage[index]
-          
-        return value
+        cur_node = self.storage[index]
+        while cur_node is not None:
+            if cur_node.key == key:
+                return cur_node.value
+            cur_node = cur_node.next
+        # key not found - return None
+        return None          
+       
 
 
     def resize(self, new_capacity):
