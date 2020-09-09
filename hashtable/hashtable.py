@@ -69,7 +69,8 @@ class HashTable:
         
         for byte in key_bytes:
             hash = hash * FNV_prime
-            hash = hash ^ byte           
+            hash = hash ^ byte  
+        return hash         
             
 
 
