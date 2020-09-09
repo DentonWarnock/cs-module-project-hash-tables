@@ -69,8 +69,7 @@ class HashTable:
         
         for byte in key_bytes:
             hash = hash * FNV_prime
-            hash = hash ^ byte
-            
+            hash = hash ^ byte           
             
 
 
@@ -112,12 +111,12 @@ class HashTable:
             while cur_node is not None:
                 if cur_node.key == key:
                     cur_node.value = value
-                    break
+                    return
                 cur_node = cur_node.next
             # key not found in linked list - add new entry to head
-            cur_bucket = self.storage[index]
+            old_head = self.storage[index]
             self.storage[index] = HashTableEntry(key, value)
-            self.storage[index].next = cur_bucket
+            self.storage[index].next = old_head
             self.size += 1
         else:
             # we have an empty slot, add a new node
@@ -170,7 +169,7 @@ class HashTable:
         Implement this.
         """
         # hash the key
-         # take the hash and mod it with len of array
+        # take the hash and mod it with len of array
         index = self.hash_index(key)
           # go to index and put in value
         cur_node = self.storage[index]
@@ -179,8 +178,7 @@ class HashTable:
                 return cur_node.value
             cur_node = cur_node.next
         # key not found - return None
-        return None
-       
+        return None       
 
 
     def resize(self, new_capacity):
@@ -203,7 +201,6 @@ class HashTable:
             while cur_node is not None:
                 self.put(cur_node.key, cur_node.value)
                 cur_node = cur_node.next
-
 
 
 if __name__ == "__main__":
