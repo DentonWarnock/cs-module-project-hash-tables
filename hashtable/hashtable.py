@@ -18,10 +18,17 @@ class HashTable:
     that accepts string keys
 
     Implement this.
+    
+    'make a hash table backed by an array'
     """
 
     def __init__(self, capacity):
-        # Your code here
+        if capacity < MIN_CAPACITY:
+            self.capacity = MIN_CAPACITY
+        else:
+            self.capacity = capacity
+        self.storage = [None] * capacity
+        self.size = 0
 
 
     def get_num_slots(self):
@@ -34,7 +41,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return len(self.storage)
 
 
     def get_load_factor(self):
@@ -43,7 +50,7 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        return self.num_items / self.get_num_slots()
 
 
     def fnv1(self, key):
@@ -54,6 +61,17 @@ class HashTable:
         """
 
         # Your code here
+        FNV_offset_basis = 14695981039346656037
+        FNV_prime = 1099511628211
+        
+        hash = FNV_offset_basis
+        key_bytes = key.encode()
+        
+        for byte in key_bytes:
+            hash = hash * FNV_prime
+            hash = hash ^ byte  
+        return hash         
+            
 
 
     def djb2(self, key):
@@ -62,7 +80,10 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
+        for character in key:
+            hash = (hash * 33) + hash + ord(character)
+        return hash
 
 
     def hash_index(self, key):
@@ -80,9 +101,29 @@ class HashTable:
         Hash collisions should be handled with Linked List Chaining.
 
         Implement this.
-        """
-        # Your code here
-
+        """        
+        # hash the key
+        # take the hash and mod it with len of array
+        index = self.hash_index(key)
+        # go to index and put in value
+        if self.storage[index] is not None:
+            #collision! search through linked listed to see if key already exisits - if so overwrite the value
+            cur_node = self.storage[index]
+            while cur_node is not None:
+                if cur_node.key == key:
+                    cur_node.value = value
+                    return
+                cur_node = cur_node.next
+            # key not found in linked list - add new entry to head
+            old_head = self.storage[index]
+            self.storage[index] = HashTableEntry(key, value)
+            self.storage[index].next = old_head
+            self.size += 1
+        else:
+            # we have an empty slot, add a new node
+            self.storage[index] = HashTableEntry(key, value)
+            self.size += 1
+        
 
     def delete(self, key):
         """
@@ -92,8 +133,33 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+       # assign bucket back to None
+        index = self.hash_index(key)  
+        cur_node = self.storage[index]
+        if cur_node is None:
+            return f"{key} not found"
+        else:
+            # if head is the value, remove head by pointing index value to head.next, reduce size by 1, and return removed value
+            if cur_node.key == key:
+                self.storage[index] = cur_node.next
+                self.size -= 1
+                return cur_node.value
+            else:
+                # search through SLL and remove pointer to item if key is found
+                prev_node = cur_node
+                cur_node = cur_node.next
+                while cur_node is not None:
+                    if cur_node.key == key:
+                        prev_node.next = cur_node.next
+                        self.size -= 1
+                        return cur_node.value
+                    else:
+                        # iterate the loop until end
+                        prev_node = cur_node
+                        cur_node = cur_node.next
+                # key not found, return none
+                return f"{key} not found"
+     
 
     def get(self, key):
         """
@@ -103,7 +169,17 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        # hash the key
+        # take the hash and mod it with len of array
+        index = self.hash_index(key)
+          # go to index and put in value
+        cur_node = self.storage[index]
+        while cur_node is not None:
+            if cur_node.key == key:
+                return cur_node.value
+            cur_node = cur_node.next
+        # key not found - return None
+        return None       
 
 
     def resize(self, new_capacity):
@@ -113,8 +189,19 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
-
+       # make a copy of the storage array
+        copy_storage = self.storage
+       # set the new capacity
+        self.capacity = new_capacity
+       # resize the array based on new capacity
+        self.storage = [None] * self.capacity
+        self.size = 0
+       # add all of copied storage items to new resized array
+        for bucket in copy_storage:
+            cur_node = bucket
+            while cur_node is not None:
+                self.put(cur_node.key, cur_node.value)
+                cur_node = cur_node.next
 
 
 if __name__ == "__main__":

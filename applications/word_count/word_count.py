@@ -1,6 +1,19 @@
 def word_count(s):
     # Your code here
-
+    words = {}
+    ignore = ('"', ':', ';', ',', '.', '-', '+', '=', '/', '\\', '|', '[', ']', '{', '}', '(', ')', '*', '^', '&')
+    
+    for char in ignore:
+        s = s.replace(char, "")
+        
+    s = s.split()
+    
+    for word in s:
+        if word.lower() not in words:
+            words[word.lower()] = 1
+        else:
+            words[word.lower()] += 1
+    return words
 
 
 if __name__ == "__main__":
